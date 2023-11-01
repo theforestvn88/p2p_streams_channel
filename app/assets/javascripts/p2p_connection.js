@@ -8,11 +8,12 @@ const CONFIG = {
 }
 
 export default class P2pConnection {
-    constructor(container, signaling, session, peerId) {
+    constructor(container, signaling, session, peerId, config) {
         this.container = container
         this.signaling = signaling
         this.session = session
         this.peerId = peerId
+        this.config = config || CONFIG
     }
     
     signal(type, data) {
@@ -28,7 +29,7 @@ export default class P2pConnection {
 
     start() {
         console.log("connection start ...")
-        this.connection = new RTCPeerConnection(CONFIG)
+        this.connection = new RTCPeerConnection(this.config)
         this.connection.onicecandidate = event => {
             console.log(`onicecandidate`)
             console.log(event)

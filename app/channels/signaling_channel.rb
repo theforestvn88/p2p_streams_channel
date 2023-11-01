@@ -22,7 +22,6 @@ class SignalingChannel < Turbo::StreamsChannel
         end
     end
 
-
     def self.sync(data, to:)
         ActionCable.server.broadcast stream_name_from(to), data
     end

@@ -12,7 +12,7 @@ class P2pFrameElement extends HTMLElement {
         disconnected: this.subscriptionDisconnected.bind(this)
       }).catch(err => console.log(err));
 
-      this.connection = new P2pConnection(this, this.subscription, this.session, this.peerId)
+      this.connection = new P2pConnection(this, this.subscription, this.session, this.peerId, this.config)
     }
 
     // called each time the element is removed from the document.
@@ -68,8 +68,12 @@ class P2pFrameElement extends HTMLElement {
       return this.getAttribute("peer-id")
     }
 
+    get params() {
+      return JSON.parse(this.getAttribute("params"))
+    }
+
     get config() {
-      return JSON.parse(this.getAttribute("config"))
+      return this.params["config"]
     }
 }
 

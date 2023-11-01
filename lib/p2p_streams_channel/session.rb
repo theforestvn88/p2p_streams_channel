@@ -8,13 +8,11 @@ module P2pStreamsChannel
     TYPE_MANY_TO_MANY = "*2*"
 
     class Session
-        attr_reader :id, :type, :clazz, :clazz_id
+        attr_reader :id, :type
         
-        def initialize(id, type, clazz = nil, clazz_id = nil)
+        def initialize(id, type)
             @id = id
             @type = type
-            @clazz = clazz
-            @clazz_id = clazz_id
 
             @connection = \
                 case type
@@ -25,16 +23,28 @@ module P2pStreamsChannel
                 end
         end
 
+        def signature
+            {id: @id, type: @type}
+        end
+
         def to_param
-            {id: @id, type: @type, clazz: @clazz, clazz_id: @clazz_id}.to_param
+            signature.to_param
+        end
+
+        def to_json
+            signature.to_json
         end
 
         def self.from_json(json)
-            P2pStreamsChannel::Session.new(json["id"], json["type"], json["clazz"], json["clazz_id"])
+            P2pStreamsChannel::Session.new(json["id"], json["type"])
         end
 
         def join(peer_id)
             @connection&.join(peer_id)
+        end
+
+        def connected
+            # TODO: when peers connected -> stop signaling connection
         end
     end
 end
