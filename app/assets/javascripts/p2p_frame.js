@@ -51,6 +51,10 @@ class P2pFrameElement extends HTMLElement {
       })
     }
 
+    sendP2pMessage(msg) {
+      this.connection.sendP2pMessage(msg)
+    }
+
     get channel() {
       const channel = this.getAttribute("channel")
       const signed_stream_name = this.getAttribute("signed-stream-name")
