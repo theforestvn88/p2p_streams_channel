@@ -9,6 +9,7 @@ const CONFIG = {
 
 export default class P2pConnection {
     constructor(container, signaling, session, peerId, config) {
+        console.log(`P2pConnection container ${container}`)
         this.container = container
         this.signaling = signaling
         this.session = session
@@ -43,17 +44,43 @@ export default class P2pConnection {
             console.log(`oniceconnectionstatechange`)
             console.log(event)
         }
+
+        this.connection.onconnectionstatechange = (ev) => {
+            console.log("onconnectionstatechange")
+            console.log(ev)
+            console.log(this.connection.connectionState)
+            switch (this.connection.connectionState) {
+              // case "new":
+              // case "connecting":
+              //   this.p2pConnecting(ev)
+              //   break;
+              case "connected":
+                this.container.p2pConnected(ev)
+                break
+              case "disconnected":
+                this.container.p2pDisconnected(ev)
+                break
+              case "closed":
+                this.container.p2pClosed(ev)
+                break
+              case "failed":
+                this.container.p2pError(ev)
+                break
+              default:
+                break
+            }
+          }
         
-        this.sendDataChannel = this.connection.createDataChannel("sendChannel");
-        this.sendDataChannel.onopen = this.handleSendChannelStatusChange;
-        this.sendDataChannel.onclose = this.handleSendChannelStatusChange;
+        this.sendDataChannel = this.connection.createDataChannel("sendChannel")
+        this.sendDataChannel.onopen = this.handleSendChannelStatusChange.bind(this)
+        this.sendDataChannel.onclose = this.handleSendChannelStatusChange.bind(this)
 
         this.connection.ondatachannel = event => {
             console.log("ondatachannel p2p ...")
             this.receiveDataChannel = event.channel
-            this.receiveDataChannel.onmessage = this.receiveP2pMessage
-            this.receiveDataChannel.onopen = this.handleReceiveChannelStatusChange
-            this.receiveDataChannel.onclose = this.handleReceiveChannelStatusChange
+            this.receiveDataChannel.onmessage = this.receiveP2pMessage.bind(this)
+            this.receiveDataChannel.onopen = this.handleReceiveChannelStatusChange.bind(this)
+            this.receiveDataChannel.onclose = this.handleReceiveChannelStatusChange.bind(this)
 
             this.sendDataChannel.send(`${this.peerId}: hi`)
         }
@@ -112,8 +139,10 @@ export default class P2pConnection {
                 }
                 break
             case MessageType.IceCandidate:
-                this.connection.addIceCandidate(new RTCIceCandidate(data[MessageType.IceCandidate]))
-                    .catch(err => console.log(err))
+                if (data[MessageType.IceCandidate]) {
+                    this.connection.addIceCandidate(new RTCIceCandidate(data[MessageType.IceCandidate]))
+                        .catch(err => console.log(err))
+                }
                 break
             case MessageType.Error:
                 console.log(data)
@@ -125,8 +154,7 @@ export default class P2pConnection {
 
     receiveP2pMessage(event) {
         console.log(`p2p received msg: ${event.data}`)
-        // TODO:
-        // this.container.dispatchP2pMessage(event.data)        
+        this.container.dispatchP2pMessage(event.data)        
     }
 
     sendP2pMessage(message) {

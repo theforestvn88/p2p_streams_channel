@@ -2,17 +2,22 @@ import { Turbo, cable } from "@hotwired/turbo-rails"
 import P2pConnection from "./p2p_connection"
 
 class P2pFrameElement extends HTMLElement {
+    constructor() {
+      super()
+      this.listeners ||= []
+    }
+
     // called each time the element is added to the document.
     async connectedCallback() {
-      console.log("p2p-frame connected")
-      Turbo.connectStreamSource(this);
+      Turbo.connectStreamSource(this)
       this.subscription = await cable.subscribeTo(this.channel, {
         received: this.receiveSignal.bind(this),
         connected: this.subscriptionConnected.bind(this),
         disconnected: this.subscriptionDisconnected.bind(this)
-      }).catch(err => console.log(err));
+      }).catch(err => console.log(err))
 
       this.connection = new P2pConnection(this, this.subscription, this.session, this.peerId, this.config)
+      this.p2pConnecting()
     }
 
     // called each time the element is removed from the document.
@@ -24,7 +29,6 @@ class P2pFrameElement extends HTMLElement {
 
     subscriptionConnected() {
       console.log("subscriptionConnected")
-      
       this.connection.start()
     }
   
@@ -38,21 +42,52 @@ class P2pFrameElement extends HTMLElement {
       this.connection.handleConnectionMessage(message)
     }
 
-    setP2pListener(listener) { // listener is_a P2pController
+    setP2pListener(listener) {
       this.listeners ||= []
       this.listeners.push(listener)
+      console.log(this.listeners)
     }
 
     dispatchP2pMessage(message) {
-      // TODO: dispatch message to any nested controllers which implement handleP2pMessage
-      // extends P2pController ?
-      this.listeners.each(listener => {
-        
+      this.listeners.forEach(listener => {
+        listener.receiveP2pMessage(message)
       })
     }
 
     sendP2pMessage(msg) {
       this.connection.sendP2pMessage(msg)
+    }
+
+    p2pConnecting() {
+      this.listeners.forEach(listener => {
+        listener.p2pConnecting()
+      })
+    }
+
+    p2pConnected(ev) {
+      console.log("p2pConnected")
+      console.log(this.listeners)
+      this.listeners.forEach(listener => {
+        listener.p2pConnected(ev)
+      })
+    }
+
+    p2pDisconnected(ev) {
+      this.listeners.forEach(listener => {
+        listener.p2pDisconnected(ev)
+      })
+    }
+
+    p2pClosed(ev) {
+      this.listeners.forEach(listener => {
+        listener.p2pClosed(ev)
+      })
+    }
+
+    p2pError(ev) {
+      this.listeners.forEach(listener => {
+        listener.p2pError(ev)
+      })
     }
 
     get channel() {
