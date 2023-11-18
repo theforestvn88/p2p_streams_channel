@@ -1,5 +1,5 @@
 import { Turbo, cable } from "@hotwired/turbo-rails"
-import P2pConnection from "./p2p_connection"
+import P2pPeer from "./p2p_peer"
 
 class P2pFrameElement extends HTMLElement {
     constructor() {
@@ -16,8 +16,7 @@ class P2pFrameElement extends HTMLElement {
         disconnected: this.subscriptionDisconnected.bind(this)
       }).catch(err => console.log(err))
 
-      this.connection = new P2pConnection(this, this.subscription, this.session, this.peerId, this.config)
-      this.p2pConnecting()
+      this.peer = new P2pPeer(this.peerId, this, this.subscription, this.session, this.config)
     }
 
     // called each time the element is removed from the document.
@@ -29,7 +28,7 @@ class P2pFrameElement extends HTMLElement {
 
     subscriptionConnected() {
       console.log("subscriptionConnected")
-      this.connection.start()
+      this.peer.setup()
     }
   
     subscriptionDisconnected() {
@@ -39,7 +38,7 @@ class P2pFrameElement extends HTMLElement {
     receiveSignal(message) {
       console.log("receive signal")
       console.log(message)
-      this.connection.handleConnectionMessage(message)
+      this.peer.negotiate(message)
     }
 
     setP2pListener(listener) {

@@ -3,7 +3,7 @@
 require_relative "./cache"
 
 module P2pStreamsChannel
-    class OneToOne
+    class Negotiation
         attr_reader :session_id
 
         def initialize(session_id)
@@ -16,14 +16,14 @@ module P2pStreamsChannel
 
         def join(peer_id)
             session_state.add_peer(peer_id)
-            session_state.num_of_connected_peers == 2 ? ready : nil
+            save_session_state
+            session_state.host_ready? ? session_state.ready_response(peer_id) : nil
+        rescue => e
+            session_state.error_response(e)
         end
 
-        def ready
-            {
-                "type": P2pStreamsChannel::STATE_READY,
-                "host": session_state.peers.first.first
-            }
+        def save_session_state
+            P2pStreamsChannel.save_session_state(@session_id, session_state)
         end
     end
 end

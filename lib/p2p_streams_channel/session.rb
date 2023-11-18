@@ -1,30 +1,18 @@
 # frozen_string_literal: true
 
-require_relative "./one_to_one"
+require_relative "./negotiation"
 
 module P2pStreamsChannel
-    TYPE_ONE_TO_ONE = "121"
-    TYPE_ONE_TO_MANY = "12*"
-    TYPE_MANY_TO_MANY = "*2*"
-
     class Session
-        attr_reader :id, :type
+        attr_reader :id
         
-        def initialize(id, type)
+        def initialize(id)
             @id = id
-            @type = type
-
-            @connection = \
-                case type
-                when P2pStreamsChannel::TYPE_ONE_TO_ONE
-                    OneToOne.new(@id)
-                else
-                    nil
-                end
+            @negotiation = Negotiation.new(@id)
         end
 
         def signature
-            {id: @id, type: @type}
+            {id: @id}
         end
 
         def to_param
@@ -40,7 +28,7 @@ module P2pStreamsChannel
         end
 
         def join(peer_id)
-            @connection&.join(peer_id)
+            @negotiation.join(peer_id)
         end
 
         def connected

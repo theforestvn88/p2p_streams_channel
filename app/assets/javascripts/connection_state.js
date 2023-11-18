@@ -1,5 +1,5 @@
 // TODO: rename to connection state
-export const MessageType = {
+export const ConnectionState = {
     SessionJoin: "SessionJoin",
     SessionReady: "SessionReady",
     SdpOffer: "SdpOffer",
