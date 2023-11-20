@@ -1,4 +1,3 @@
-// TODO: rename to connection state
 export const ConnectionState = {
     SessionJoin: "SessionJoin",
     SessionReady: "SessionReady",

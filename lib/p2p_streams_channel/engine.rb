@@ -16,5 +16,9 @@ module P2pStreamsChannel
               helper P2pStreamsChannel::Engine.helpers
             end
         end
+
+        initializer "p2p_streams_channel.importmap", before: "importmap" do |app|
+          app.config.importmap.paths << Engine.root.join("config/importmap.rb")
+        end
     end
 end
