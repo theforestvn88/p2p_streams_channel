@@ -24,7 +24,7 @@ module P2pStreamsChannel
         end
 
         def self.from_json(json)
-            P2pStreamsChannel::Session.new(json["id"], json["type"])
+            P2pStreamsChannel::Session.new(json["id"])
         end
 
         def join(peer_id)

@@ -40,6 +40,7 @@ export default class P2pConnection {
           }
         
         this.sendDataChannel = this.rtcPeerConnection.createDataChannel("sendChannel")
+        this.sendDataChannelOpenState = false
         this.sendDataChannel.onopen = this.handleSendChannelStatusChange.bind(this)
         this.sendDataChannel.onclose = this.handleSendChannelStatusChange.bind(this)
 
@@ -62,11 +63,18 @@ export default class P2pConnection {
     }
 
     sendP2pMessage(message) {
-        this.sendDataChannel.send(message)
+        if (this.sendDataChannel && this.sendDataChannelOpenState) {
+            this.sendDataChannel.send(message)
+        } else {
+            console.warn("the send data channel is not available!")
+        }
     }
 
     handleSendChannelStatusChange(event) {
         console.log(event)
+        if (this.sendDataChannel) {
+            this.sendDataChannelOpenState = this.sendDataChannel.readyState == "open"
+        }
     }
 
     handleReceiveChannelStatusChange(event) {

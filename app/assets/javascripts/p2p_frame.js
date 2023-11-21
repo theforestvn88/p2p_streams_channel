@@ -49,12 +49,12 @@ class P2pFrameElement extends HTMLElement {
 
     dispatchP2pMessage(message) {
       this.listeners.forEach(listener => {
-        listener.receiveP2pMessage(message)
+        listener.p2pReceivedMessage(message)
       })
     }
 
     sendP2pMessage(msg) {
-      this.connection.sendP2pMessage(msg)
+      this.peer.sendP2pMessage(msg)
     }
 
     p2pConnecting() {

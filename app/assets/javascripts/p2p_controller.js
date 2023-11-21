@@ -1,12 +1,13 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-    static targets = [ "received" ]
-
-    connect() {
-        console.log("p2pController connected ...")
+    p2pSetup() {
         this.p2pFrame = this.element.closest("p2p-frame")
-        this.p2pFrame.setP2pListener(this)
+        if (this.p2pFrame) {
+            this.p2pFrame.setP2pListener(this)
+        } else {
+            throw new Error("Couldn't find p2p-frame!")
+        }
     }
 
     // p2p callbacks
@@ -31,36 +32,14 @@ export default class extends Controller {
         console.log("p2pError ... ")
     }
 
-    // send p2p message
-    send(event) {
-        // let sendView = event.target
-        // let contentView = document.querySelector(sendView.getAttribute("content-view"))
-        // let msg = JSON.stringify({
-        //     msgType: contentView.getAttribute("msg-type") || "html-text",
-        //     msgReceiver: sendView.getAttribute("msg-receiver"),
-        //     msgContent: contentView.value
-        // })
-        // this.receive(msg)
-        // this.p2pFrame.sendP2pMessage(msg)
+    // send/received p2p message
+
+    p2pSendMessage(message) {
+        if (this.p2pFrame) {
+            this.p2pFrame.sendP2pMessage(message)
+        }
     }
 
-    // receive p2p message callback
-    receiveP2pMessage(msg) {
-        // console.log("p2pcontroller receive msg")
-        // console.log(msg)
-        // let receivedMsg = JSON.parse(msg)
-        // let msgType = receivedMsg.msgType
-        // switch(msgType) {
-        //     case "html-text":
-        //         let msgReceiverView = document.getElementById(receivedMsg.msgReceiver)
-        //         msgReceiverView.insertAdjacentHTML("beforeend", `<p>${receivedMsg.msgContent}</p>`)
-        //         break
-        //     case "html-turbo":
-        //         // Turbo.renderStreamMessage(html)
-        //         break
-        //     case "video":
-        //         // 
-        //         break
-        // }
+    p2pReceivedMessage(message) {
     }
 }

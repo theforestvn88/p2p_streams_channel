@@ -37,6 +37,7 @@ export default class P2pPeer {
                 break
             case ConnectionState.SessionReady:
                 if (msg.host_peer_id == this.peerId) { // iam host
+                    this.iamHost = true
                     const connection = new P2pConnection(this, msg.peer_id, this.peerId, this.config)
                     this.connections.push(connection)
                     console.log(this.connections)
@@ -113,12 +114,17 @@ export default class P2pPeer {
         }
     }
 
+    sendP2pMessage(msg) {
+        this.connections.forEach(connection => {
+            connection.sendP2pMessage(msg)
+        })
+    }
+
     receivedP2pMessage(msg) {
+        console.log(`receivedP2pMessage ${msg}`)
         if (this.iamHost) {
             //broadcast to all connections
-            this.connections.forEach(connection => {
-                connection.sendP2pMessage(msg)
-            })
+            this.sendP2pMessage(msg)
         }
 
         // dispatch msg to all sub views
