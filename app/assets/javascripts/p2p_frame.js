@@ -22,8 +22,8 @@ class P2pFrameElement extends HTMLElement {
     // called each time the element is removed from the document.
     disconnectedCallback() {
       console.log("p2p-frame disconnected")
-      Turbo.disconnectStreamSource(this);
-      if (this.subscription) this.subscription.unsubscribe()
+      
+      this.unsubscribeSignalChannel()
     }
 
     subscriptionConnected() {
@@ -63,12 +63,18 @@ class P2pFrameElement extends HTMLElement {
       })
     }
 
-    p2pConnected(ev) {
-      console.log("p2pConnected")
+    p2pConnected(peerId, hostId, iamHost, ev) {
+      console.log(`p2pConnected ${peerId} <-> ${hostId}`)
       console.log(this.listeners)
       this.listeners.forEach(listener => {
         listener.p2pConnected(ev)
       })
+      
+      // only host-peer retain connect to the signal server ?
+      if (!iamHost) {
+        console.log("im not host so unsubscribe")
+        this.unsubscribeSignalChannel()
+      }
     }
 
     p2pDisconnected(ev) {
@@ -87,6 +93,11 @@ class P2pFrameElement extends HTMLElement {
       this.listeners.forEach(listener => {
         listener.p2pError(ev)
       })
+    }
+
+    unsubscribeSignalChannel() {
+      Turbo.disconnectStreamSource(this)
+      if (this.subscription) this.subscription.unsubscribe()
     }
 
     get channel() {

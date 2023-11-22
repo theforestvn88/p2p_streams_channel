@@ -8,10 +8,11 @@ const CONFIG = {
 }
 
 export default class P2pConnection {
-    constructor(peer, peerId, hostId, config) {
+    constructor(peer, peerId, hostId, iamHost, config) {
         this.peer = peer
         this.peerId = peerId
         this.hostId = hostId
+        this.iamHost = iamHost
         this.config = config || CONFIG
     }
 
@@ -36,7 +37,7 @@ export default class P2pConnection {
             console.log("onconnectionstatechange")
             console.log(ev)
             console.log(this.rtcPeerConnection.connectionState)
-            this.peer.dispatchP2pConnectionState(this.peerId, this.rtcPeerConnection.connectionState, ev)
+            this.peer.dispatchP2pConnectionState(this.peerId, this.hostId, this.iamHost, this.rtcPeerConnection.connectionState, ev)
           }
         
         this.sendDataChannel = this.rtcPeerConnection.createDataChannel("sendChannel")

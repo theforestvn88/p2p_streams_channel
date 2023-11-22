@@ -4,11 +4,11 @@ import P2pConnection from "./p2p_connection"
 export default class P2pPeer {
     constructor(peerId, container, signaling, session, config) {
         this.peerId = peerId
+        this.iamHost = null
         this.container = container
         this.signaling = signaling
         this.session = session
         this.config = config
-        this.iamHost = null
         this.state = null
     }
 
@@ -38,7 +38,7 @@ export default class P2pPeer {
             case ConnectionState.SessionReady:
                 if (msg.host_peer_id == this.peerId) { // iam host
                     this.iamHost = true
-                    const connection = new P2pConnection(this, msg.peer_id, this.peerId, this.config)
+                    const connection = new P2pConnection(this, msg.peer_id, this.peerId, this.iamHost, this.config)
                     this.connections.push(connection)
                     console.log(this.connections)
                     const rtcPeerConnection = connection.setupRTCPeerConnection()
@@ -59,7 +59,7 @@ export default class P2pPeer {
                 break
             case ConnectionState.SdpOffer:
                 if (msg.host_peer_id != this.peerId && this.state != ConnectionState.SdpOffer) { // iam not host
-                    const connection = new P2pConnection(this, this.peerId, msg.host_peer_id, this.config)
+                    const connection = new P2pConnection(this, this.peerId, msg.host_peer_id, this.iamHost, this.config)
                     this.connections.push(connection)
                     
                     const rtcPeerConnection = connection.setupRTCPeerConnection()
@@ -131,14 +131,14 @@ export default class P2pPeer {
         this.container.dispatchP2pMessage(msg)
     }
 
-    dispatchP2pConnectionState(peer_id, connectionState, ev) {
+    dispatchP2pConnectionState(peerId, hostId, iamHost, connectionState, ev) {
         switch (connectionState) {
             // case "new":
             // case "connecting":
             //   this.p2pConnecting(ev)
             //   break;
             case "connected":
-              this.container.p2pConnected(ev)
+              this.container.p2pConnected(peerId, hostId, iamHost, ev)
               break
             case "disconnected":
               this.container.p2pDisconnected(ev)
