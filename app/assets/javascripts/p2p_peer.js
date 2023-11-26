@@ -1,7 +1,8 @@
-import { ConnectionState } from "./connection_state"
+import { ConnectionState, MessageType } from "./message"
 import P2pConnection from "./p2p_connection"
 
 export default class P2pPeer {
+    // TODO: add channelId
     constructor(peerId, container, signaling, session, config) {
         this.peerId = peerId
         this.iamHost = null
@@ -21,6 +22,7 @@ export default class P2pPeer {
 
     signal(state, data) {
         let msg = {
+            "type": MessageType.Connection,
             "session": this.session,
             "peer_id": this.peerId,
             "state": state,
@@ -42,6 +44,10 @@ export default class P2pPeer {
                     this.connections.push(connection)
                     console.log(this.connections)
                     const rtcPeerConnection = connection.setupRTCPeerConnection()
+                    if (!rtcPeerConnection) {
+                        // TODO: failed case
+                        return
+                    }
                     rtcPeerConnection.createOffer()
                         .then(offer => {
                             return rtcPeerConnection.setLocalDescription(offer)
@@ -120,15 +126,29 @@ export default class P2pPeer {
         })
     }
 
-    receivedP2pMessage(msg) {
-        console.log(`receivedP2pMessage ${msg}`)
-        if (this.iamHost) {
-            //broadcast to all connections
-            this.sendP2pMessage(msg)
+    receivedP2pMessage(message) {
+        const msg = JSON.parse(message)
+        switch (msg.type) {
+            case MessageType.Heartbeat:
+                this.connections.forEach(connection => {
+                    if (connection.peerId == msg.peerId || connection.peerId == msg.hostId) {
+                        connection.state = ConnectionState.Connected
+                        connection.lastTimeUpdate = Date.now()
+                    }
+                })                
+                break
+            case MessageType.Data:
+                if (this.iamHost) {
+                    //broadcast to all connections
+                    this.sendP2pMessage(msg)
+                }
+    
+                // dispatch msg to all sub views
+                this.container.dispatchP2pMessage(msg)
+                break
+            default:
+                break
         }
-
-        // dispatch msg to all sub views
-        this.container.dispatchP2pMessage(msg)
     }
 
     dispatchP2pConnectionState(peerId, hostId, iamHost, connectionState, ev) {
@@ -137,20 +157,20 @@ export default class P2pPeer {
             // case "connecting":
             //   this.p2pConnecting(ev)
             //   break;
-            case "connected":
-              this.container.p2pConnected(peerId, hostId, iamHost, ev)
-              break
-            case "disconnected":
-              this.container.p2pDisconnected(ev)
-              break
-            case "closed":
-              this.container.p2pClosed(ev)
-              break
-            case "failed":
-              this.container.p2pError(ev)
-              break
+            case ConnectionState.Connected:
+                this.container.p2pConnected(peerId, hostId, iamHost, ev)
+                break
+            case ConnectionState.DisConnected:
+                this.container.p2pDisconnected(peerId, hostId, iamHost, ev)
+                break
+            case ConnectionState.Closed:
+                this.container.p2pClosed(peerId, hostId, iamHost, ev)
+                break
+            case ConnectionState.Failed:
+                this.container.p2pError(peerId, hostId, iamHost, ev)
+                break
             default:
-              break
+                break
           }
     }
 }

@@ -1,5 +1,6 @@
 import { Turbo, cable } from "@hotwired/turbo-rails"
 import P2pPeer from "./p2p_peer"
+import { MessageType } from "./message"
 
 class P2pFrameElement extends HTMLElement {
     constructor() {
@@ -38,7 +39,9 @@ class P2pFrameElement extends HTMLElement {
     receiveSignal(message) {
       console.log("receive signal")
       console.log(message)
-      this.peer.negotiate(message)
+      if (message.type == MessageType.Connection) {
+        this.peer.negotiate(message)
+      }
     }
 
     setP2pListener(listener) {
@@ -77,21 +80,21 @@ class P2pFrameElement extends HTMLElement {
       }
     }
 
-    p2pDisconnected(ev) {
+    p2pDisconnected(peerId, hostId, iamHost, ev) {
       this.listeners.forEach(listener => {
-        listener.p2pDisconnected(ev)
+        listener.p2pDisconnected(peerId, hostId, iamHost, ev)
       })
     }
 
-    p2pClosed(ev) {
+    p2pClosed(peerId, hostId, iamHost, ev) {
       this.listeners.forEach(listener => {
-        listener.p2pClosed(ev)
+        listener.p2pClosed(peerId, hostId, iamHost, ev)
       })
     }
 
-    p2pError(ev) {
+    p2pError(peerId, hostId, iamHost, ev) {
       this.listeners.forEach(listener => {
-        listener.p2pError(ev)
+        listener.p2pError(peerId, hostId, iamHost, ev)
       })
     }
 

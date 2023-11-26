@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module P2pStreamsChannel
+    MESSAGE_TYPE = "Connection".freeze
     STATE_JOIN = "SessionJoin".freeze
     STATE_READY = "SessionReady".freeze
 
@@ -27,6 +28,7 @@ module P2pStreamsChannel
 
         def ready_response(peer_id)
             {
+                "type": P2pStreamsChannel::MESSAGE_TYPE,
                 "state": P2pStreamsChannel::STATE_READY,
                 "host_peer_id": @host_peer_id,
                 "peer_id": peer_id
