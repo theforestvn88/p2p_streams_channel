@@ -7,12 +7,12 @@ class SignalingChannel < Turbo::StreamsChannel
     end
 
     def handle_session(data)
-        state, peer_id, session = data["state"], data["peer_id"], P2pStreamsChannel::Session.from_json(JSON.parse(data["session"]))
+        session = P2pStreamsChannel.fetch_session(data["session_id"])
 
         send_back_msg = \
-            case state
+            case data["state"]
             when P2pStreamsChannel::STATE_JOIN
-                session.join(peer_id)
+                session.join(data["peer_id"])
             else
                 data
             end

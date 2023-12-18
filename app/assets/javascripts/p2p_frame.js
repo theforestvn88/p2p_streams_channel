@@ -17,7 +17,7 @@ class P2pFrameElement extends HTMLElement {
         disconnected: this.subscriptionDisconnected.bind(this)
       }).catch(err => console.log(err))
 
-      this.peer = new P2pPeer(this.peerId, this, this.subscription, this.session, this.config)
+      this.peer = new P2pPeer(this.sessionId, this.peerId, this, this.subscription, this.config)
     }
 
     // called each time the element is removed from the document.
@@ -98,7 +98,7 @@ class P2pFrameElement extends HTMLElement {
       })
     }
 
-    unsubscribeSignalChannel() {
+    unsubscribeSignalChannel() { // TODO: MAKE SURE `SignalingChannel stopped streaming`
       Turbo.disconnectStreamSource(this)
       if (this.subscription) this.subscription.unsubscribe()
     }
@@ -112,8 +112,8 @@ class P2pFrameElement extends HTMLElement {
       }
     }
 
-    get session() {
-      return this.getAttribute("session")
+    get sessionId() {
+      return this.getAttribute("session-id")
     }
 
     get peerId() {

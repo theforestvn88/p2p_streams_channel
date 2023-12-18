@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 require_relative "lib/p2p_streams_channel/version"
 
 Gem::Specification.new do |spec|

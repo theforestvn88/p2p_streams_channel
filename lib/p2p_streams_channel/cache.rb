@@ -5,14 +5,13 @@ require_relative "./session_state"
 module P2pStreamsChannel
     module_function
             
-    # TODO: using rails cache
-    FAKE_SESSION = {}
-
-    def fetch_session_state(session_id)
-        FAKE_SESSION[session_id] ||= SessionState.new
+    def fetch_session(session_id, **options, &block)
+        Rails.cache.fetch(session_id, **options) do
+            block&.call
+        end
     end
 
-    def save_session_state(session_id, session_state)
-        # FAKE_SESSION[session_id] = session_state
+    def save_session(session)
+        Rails.cache.write(session.id, session)
     end
 end

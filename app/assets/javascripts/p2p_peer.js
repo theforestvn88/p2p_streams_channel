@@ -2,14 +2,13 @@ import { ConnectionState, MessageType } from "./message"
 import P2pConnection from "./p2p_connection"
 
 export default class P2pPeer {
-    // TODO: add channelId
-    constructor(peerId, container, signaling, session, config) {
+    constructor(sessionId, peerId, container, signaling, config) {
         this.peerId = peerId
-        this.iamHost = null
+        this.sessionId = sessionId
         this.container = container
         this.signaling = signaling
-        this.session = session
         this.config = config
+        this.iamHost = null
         this.state = null
     }
 
@@ -23,7 +22,7 @@ export default class P2pPeer {
     signal(state, data) {
         let msg = {
             "type": MessageType.Connection,
-            "session": this.session,
+            "session_id": this.sessionId,
             "peer_id": this.peerId,
             "state": state,
             ...data
@@ -40,9 +39,13 @@ export default class P2pPeer {
             case ConnectionState.SessionReady:
                 if (msg.host_peer_id == this.peerId) { // iam host
                     this.iamHost = true
+                    if (msg.peer_id == this.peerId) {
+                        return
+                    }
+
                     const connection = new P2pConnection(this, msg.peer_id, this.peerId, this.iamHost, this.config)
                     this.connections.push(connection)
-                    console.log(this.connections)
+
                     const rtcPeerConnection = connection.setupRTCPeerConnection()
                     if (!rtcPeerConnection) {
                         // TODO: failed case

@@ -3,16 +3,18 @@
 require_relative "./negotiation"
 
 module P2pStreamsChannel
+    # TODO: support optional :db -> save session to db
     class Session
-        attr_reader :id
+        attr_reader :id, :secret_key, :negotiation
         
-        def initialize(id)
+        def initialize(id, secret_key: "")
             @id = id
+            @secret_key = secret_key
             @negotiation = Negotiation.new(@id)
         end
 
         def signature
-            {id: @id}
+            {id: @id, secret_key: @secret_key}
         end
 
         def to_param
@@ -23,16 +25,14 @@ module P2pStreamsChannel
             signature.to_json
         end
 
-        def self.from_json(json)
-            P2pStreamsChannel::Session.new(json["id"])
-        end
-
         def join(peer_id)
-            @negotiation.join(peer_id)
+            @negotiation.join(peer_id).tap do |_|
+                P2pStreamsChannel.save_session(self)
+            end
         end
 
-        def connected
-            # TODO: when peers connected -> stop signaling connection
+        def state
+            negotiation.session_state
         end
     end
 end
