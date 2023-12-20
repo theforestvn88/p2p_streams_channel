@@ -60,41 +60,45 @@ class P2pFrameElement extends HTMLElement {
       this.peer.sendP2pMessage(msg)
     }
 
+    p2pNegotiating() {
+      this.listeners.forEach(listener => {
+        listener.p2pNegotiating()
+      })
+    }
+
     p2pConnecting() {
       this.listeners.forEach(listener => {
         listener.p2pConnecting()
       })
     }
 
-    p2pConnected(peerId, hostId, iamHost, ev) {
-      console.log(`p2pConnected ${peerId} <-> ${hostId}`)
-      console.log(this.listeners)
+    p2pConnected() {
       this.listeners.forEach(listener => {
-        listener.p2pConnected(ev)
+        listener.p2pConnected()
       })
       
       // only host-peer retain connect to the signal server ?
-      if (!iamHost) {
+      if (!this.peer?.iamHost) {
         console.log("im not host so unsubscribe")
         this.unsubscribeSignalChannel()
       }
     }
 
-    p2pDisconnected(peerId, hostId, iamHost, ev) {
+    p2pDisconnected() {
       this.listeners.forEach(listener => {
-        listener.p2pDisconnected(peerId, hostId, iamHost, ev)
+        listener.p2pDisconnected()
       })
     }
 
-    p2pClosed(peerId, hostId, iamHost, ev) {
+    p2pClosed() {
       this.listeners.forEach(listener => {
-        listener.p2pClosed(peerId, hostId, iamHost, ev)
+        listener.p2pClosed()
       })
     }
 
-    p2pError(peerId, hostId, iamHost, ev) {
+    p2pError() {
       this.listeners.forEach(listener => {
-        listener.p2pError(peerId, hostId, iamHost, ev)
+        listener.p2pError()
       })
     }
 

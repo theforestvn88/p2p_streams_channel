@@ -3,17 +3,20 @@ import P2pConnection from "./p2p_connection"
 
 export default class P2pPeer {
     constructor(sessionId, peerId, container, signaling, config) {
-        this.peerId = peerId
         this.sessionId = sessionId
         this.container = container
         this.signaling = signaling
         this.config = config
-        this.iamHost = null
+        this.peerId = peerId
+        this.hostPeerId = null
+        this.iamHost = false
         this.state = null
     }
 
     setup() {
         this.connections = []
+
+        this.dispatchP2pConnectionState(ConnectionState.Negotiating, null)
 
         console.log("SEND ConnectionState.SessionJoin")
         this.signal(ConnectionState.SessionJoin, {})
@@ -39,6 +42,7 @@ export default class P2pPeer {
             case ConnectionState.SessionReady:
                 if (msg.host_peer_id == this.peerId) { // iam host
                     this.iamHost = true
+                    this.hostPeerId = this.peerId
                     if (msg.peer_id == this.peerId) {
                         return
                     }
@@ -68,6 +72,7 @@ export default class P2pPeer {
                 break
             case ConnectionState.SdpOffer:
                 if (msg.host_peer_id != this.peerId && this.state != ConnectionState.SdpOffer) { // iam not host
+                    this.hostPeerId = msg.host_peer_id
                     const connection = new P2pConnection(this, this.peerId, msg.host_peer_id, this.iamHost, this.config)
                     this.connections.push(connection)
                     
@@ -94,8 +99,8 @@ export default class P2pPeer {
             case ConnectionState.SdpAnswer:
                 if (msg.host_peer_id == this.peerId) { // iam host
                     console.log(` ${this.peerId} get Answer`)
-                    this.connections.forEach(c => console.log(c.peerId))
-                    const clientConnection = this.connections.find(connection => connection.peerId == msg.peer_id)
+                    this.connections.forEach(c => console.log(c.clientId))
+                    const clientConnection = this.connections.find(connection => connection.clientId == msg.peer_id)
                     console.log(clientConnection)
                     if (!clientConnection) return;
 
@@ -134,7 +139,7 @@ export default class P2pPeer {
         switch (msg.type) {
             case MessageType.Heartbeat:
                 this.connections.forEach(connection => {
-                    if (connection.peerId == msg.peerId || connection.peerId == msg.hostId) {
+                    if (connection.clientId == msg.senderclientId || connection.hostId == msg.senderclientId) {
                         connection.state = ConnectionState.Connected
                         connection.lastTimeUpdate = Date.now()
                     }
@@ -154,23 +159,25 @@ export default class P2pPeer {
         }
     }
 
-    dispatchP2pConnectionState(peerId, hostId, iamHost, connectionState, ev) {
+    dispatchP2pConnectionState(connectionState, ev) {
         switch (connectionState) {
-            // case "new":
-            // case "connecting":
-            //   this.p2pConnecting(ev)
-            //   break;
+            case ConnectionState.Negotiating:
+                this.container.p2pNegotiating()
+                break
+            case ConnectionState.Connecting:
+                this.container.p2pConnecting()
+                break
             case ConnectionState.Connected:
-                this.container.p2pConnected(peerId, hostId, iamHost, ev)
+                this.container.p2pConnected()
                 break
             case ConnectionState.DisConnected:
-                this.container.p2pDisconnected(peerId, hostId, iamHost, ev)
+                this.container.p2pDisconnected()
                 break
             case ConnectionState.Closed:
-                this.container.p2pClosed(peerId, hostId, iamHost, ev)
+                this.container.p2pClosed()
                 break
             case ConnectionState.Failed:
-                this.container.p2pError(peerId, hostId, iamHost, ev)
+                this.container.p2pError()
                 break
             default:
                 break

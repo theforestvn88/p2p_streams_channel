@@ -8,9 +8,9 @@ const CONFIG = {
 }
 
 export default class P2pConnection {
-    constructor(peer, peerId, hostId, iamHost, config) { // TODO: add heartbeatInterval to config
+    constructor(peer, clientId, hostId, iamHost, config) { // TODO: add heartbeatInterval to config
         this.peer = peer
-        this.peerId = peerId
+        this.clientId = clientId
         this.hostId = hostId
         this.iamHost = iamHost
         this.state = ConnectionState.New
@@ -22,6 +22,7 @@ export default class P2pConnection {
     setupRTCPeerConnection() {
         console.log("connection start ...")
         this.rtcPeerConnection = new RTCPeerConnection(this.config)
+
         this.rtcPeerConnection.onicecandidate = event => {
             console.log(`onicecandidate`)
             console.log(event)
@@ -44,7 +45,7 @@ export default class P2pConnection {
             if (this.state == ConnectionState.DisConnected || this.state == ConnectionState.Closed) {
                 this.close()
             }
-            this.peer.dispatchP2pConnectionState(this.peerId, this.hostId, this.iamHost, this.rtcPeerConnection.connectionState, ev)
+            this.peer.dispatchP2pConnectionState(this.rtcPeerConnection.connectionState, ev)
           }
         
         this.sendDataChannel = this.rtcPeerConnection.createDataChannel("sendChannel")
@@ -70,12 +71,12 @@ export default class P2pConnection {
 
     sendP2pMessage(message, type = MessageType.Data) {
         if (this.sendDataChannel && this.sendDataChannelOpen) {
-            this.sendDataChannel.send(JSON.stringify({
+            const msgJson = message.senderclientId ? JSON.stringify(message) : JSON.stringify({
                 type: type,
-                peerId: this.peerId,
-                hostId: this.hostId,
+                senderclientId: this.peer.peerId,
                 message: message
-            }))
+            })
+            this.sendDataChannel.send(msgJson)
         } else {
             console.warn("the send data channel is not available!")
         }
@@ -109,12 +110,12 @@ export default class P2pConnection {
     }
 
     stopHeartbeat() {
-        console.log(`stop heartbeat ${this.hostId} <-> ${this.peerId}`)
+        console.log(`stop heartbeat ${this.hostId} <-> ${this.clientId}`)
         clearTimeout(this.heartbeat)
     }
     
     close() {
-        console.log(`close the connection ${this.hostId} <-> ${this.peerId}`)
+        console.log(`close the connection ${this.hostId} <-> ${this.clientId}`)
         this.stopHeartbeat()
     }
 }
