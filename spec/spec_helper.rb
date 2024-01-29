@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "rails_helper"
 require "p2p_streams_channel"
 
 RSpec.configure do |config|
