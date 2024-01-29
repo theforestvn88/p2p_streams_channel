@@ -4,10 +4,15 @@ require_relative "./session_state"
 
 module P2pStreamsChannel
     module_function
-            
-    def fetch_session(session_id, **options, &block)
-        Rails.cache.fetch(session_id, **options) do
-            block&.call
+
+    # TODO:
+    # params[start_time]
+    # params[end_time]
+    # params[max_number_of_peers]
+    #
+    def fetch_session(session_id, **params)
+        Rails.cache.fetch(session_id) do
+            P2pStreamsChannel::Session.new(session_id, secret_key: params[:secret_key])
         end
     end
 
