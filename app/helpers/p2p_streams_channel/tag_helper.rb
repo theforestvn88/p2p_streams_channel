@@ -7,7 +7,7 @@ module P2pStreamsChannel::TagHelper
         content = capture(&block)
 
         %(
-            <p2p-frame data-controller="#{params[:controller]}" channel="SignalingChannel" signed-stream-name="#{signed_stream_name}" 
+            <p2p-frame data-controller="#{params[:js_controller]}" channel="SignalingChannel" signed-stream-name="#{signed_stream_name}" 
                 session-id=#{session.id} peer-id="#{peer_id}" params=#{params.to_json}>
                 #{content}
             </p2p-frame>

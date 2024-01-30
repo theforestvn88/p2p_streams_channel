@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "./cache"
-
 module P2pStreamsChannel
     class Negotiation
         def join(peer_id, session_state)
@@ -13,8 +11,8 @@ module P2pStreamsChannel
 
         def ready_response(peer_id, session_state)
             {
-                "type": P2pStreamsChannel::MESSAGE_TYPE,
-                "state": P2pStreamsChannel::STATE_READY,
+                "type": P2pStreamsChannel::CONNECTION_MESSAGE_TYPE,
+                "state": P2pStreamsChannel::STATE_SESSION_READY,
                 "host_peer_id": session_state.host_peer_id,
                 "peer_id": peer_id
             }

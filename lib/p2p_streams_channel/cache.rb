@@ -11,7 +11,7 @@ module P2pStreamsChannel
     # params[max_number_of_peers]
     #
     def fetch_session(session_id, **params)
-        Rails.cache.fetch(session_id) do
+        Rails.cache.fetch(session_id, expires_in: params[:expires_in]) do
             P2pStreamsChannel::Session.new(session_id, secret_key: params[:secret_key])
         end
     end

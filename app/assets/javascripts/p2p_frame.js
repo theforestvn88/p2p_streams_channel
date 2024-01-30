@@ -102,18 +102,11 @@ class P2pFrameElement extends HTMLElement {
       })
     }
 
-    unsubscribeSignalChannel() { // TODO: MAKE SURE `SignalingChannel stopped streaming`
-      Turbo.disconnectStreamSource(this)
+    async unsubscribeSignalChannel() { // TODO: MAKE SURE `SignalingChannel stopped streaming`
       if (this.subscription) this.subscription.unsubscribe()
-    }
-
-    get channel() {
-      const channel = this.getAttribute("channel")
-      const signed_stream_name = this.getAttribute("signed-stream-name")
-      return {
-        channel: channel,
-        signed_stream_name: signed_stream_name
-      }
+      Turbo.disconnectStreamSource(this)
+      let consumer = await cable.getConsumer()
+      if (consumer) consumer.disconnect()
     }
 
     get sessionId() {
@@ -130,6 +123,17 @@ class P2pFrameElement extends HTMLElement {
 
     get config() {
       return this.params["config"]
+    }
+
+    get channel() {
+      const channel = this.getAttribute("channel")
+      const signed_stream_name = this.getAttribute("signed-stream-name")
+      return {
+        channel: channel,
+        signed_stream_name: signed_stream_name,
+        session_id: this.sessionId,
+        peer_id: this.peerId,
+      }
     }
 }
 

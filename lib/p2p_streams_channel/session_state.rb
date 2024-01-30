@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module P2pStreamsChannel
-    MESSAGE_TYPE = "Connection".freeze
-    STATE_JOIN = "SessionJoin".freeze
-    STATE_READY = "SessionReady".freeze
+    STATE_SESSION_JOIN = "SessionJoin".freeze
+    STATE_SESSION_READY = "SessionReady".freeze
+    STATE_CONNECTED = "connected".freeze
 
     class SessionState
         attr_reader :peers, :host_peer_id

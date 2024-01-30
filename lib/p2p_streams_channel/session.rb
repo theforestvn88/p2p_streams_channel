@@ -15,7 +15,7 @@ module P2pStreamsChannel
         end
 
         def signature
-            {id: @id, secret_key: @secret_key}
+            {id: @id}
         end
 
         def to_param
@@ -39,6 +39,10 @@ module P2pStreamsChannel
                 session_state.remove_peer(peer_id)
                 save!
             end
+        end
+
+        def is_host_peer?(peer_id)
+            session_state.host_peer_id == peer_id
         end
 
         def reset_state
