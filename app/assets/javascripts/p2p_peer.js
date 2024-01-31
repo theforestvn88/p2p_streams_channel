@@ -128,9 +128,9 @@ export default class P2pPeer {
         }
     }
 
-    sendP2pMessage(msg) {
+    dispatchP2pMessage(msg, type, senderId) {
         this.connections.forEach(connection => {
-            connection.sendP2pMessage(msg)
+            connection.sendP2pMessage(msg, type, senderId)
         })
     }
 
@@ -146,9 +146,10 @@ export default class P2pPeer {
                 })                
                 break
             case MessageType.Data:
+            case MessageType.DataConnectionState:
                 if (this.iamHost) {
                     //broadcast to all connections
-                    this.sendP2pMessage(msg)
+                    this.dispatchP2pMessage(msg.data, msg.type, msg.senderId)
                 }
     
                 // dispatch msg to all sub views
@@ -159,8 +160,22 @@ export default class P2pPeer {
         }
     }
 
-    dispatchP2pConnectionState(connectionState, ev) {
-        switch (connectionState) {
+    updateP2pConnectionState(connection) {
+        if (this.iamHost) {
+            const states = this.connections.map(conn => ({
+                peerId: conn.clientId, 
+                state: conn.state
+            }))
+            states.push({peerId: this.hostPeerId, state: ConnectionState.Connected})
+
+            this.dispatchP2pMessage(states, MessageType.DataConnectionState, this.hostPeerId)
+        }
+
+        this.dispatchP2pConnectionState(connection)
+    }
+
+    dispatchP2pConnectionState(connection) {
+        switch (connection.state) {
             case ConnectionState.Negotiating:
                 this.container.p2pNegotiating()
                 break

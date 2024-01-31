@@ -14,9 +14,9 @@ export const ConnectionState = {
     Failed: "failed",
 }
 
-
 export const MessageType = {
     Connection: "Connection",
     Heartbeat: "Heartbeat",
     Data: "Data",
+    DataConnectionState: "Data.Connection.State",
 }

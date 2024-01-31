@@ -45,7 +45,7 @@ export default class P2pConnection {
             if (this.state == ConnectionState.DisConnected || this.state == ConnectionState.Closed) {
                 this.close()
             }
-            this.peer.dispatchP2pConnectionState(this.rtcPeerConnection.connectionState, ev)
+            this.peer.updateP2pConnectionState(this)
           }
         
         this.sendDataChannel = this.rtcPeerConnection.createDataChannel("sendChannel")
@@ -69,12 +69,12 @@ export default class P2pConnection {
         this.peer.receivedP2pMessage(event.data)        
     }
 
-    sendP2pMessage(message, type = MessageType.Data) {
+    sendP2pMessage(message, type = MessageType.Data, senderId = null) {
         if (this.sendDataChannel && this.sendDataChannelOpen) {
-            const msgJson = message.senderclientId ? JSON.stringify(message) : JSON.stringify({
+            const msgJson = JSON.stringify({
                 type: type,
-                senderclientId: this.peer.peerId,
-                message: message
+                senderclientId: senderId || this.peer.peerId,
+                data: message
             })
             this.sendDataChannel.send(msgJson)
         } else {

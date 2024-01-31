@@ -2,13 +2,11 @@ module P2pStreamsChannel
     module_function
 
     CONNECTION_MESSAGE_TYPE = "Connection".freeze
-    REQUEST_MESSAGE_TYPE = "Request".freeze
 
     def resolve(message)
         case message["type"]
         when CONNECTION_MESSAGE_TYPE
             handle_session(message)
-        when REQUEST_MESSAGE_TYPE
         else
         end
     end
@@ -19,7 +17,6 @@ module P2pStreamsChannel
             if session = P2pStreamsChannel.fetch_session(data["session_id"])
                 session.join_peer(data["peer_id"])
             end
-        when P2pStreamsChannel::STATE_CONNECTED
         else
             data
         end
