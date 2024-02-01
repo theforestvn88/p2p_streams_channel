@@ -2,11 +2,12 @@ import { ConnectionState, MessageType } from "./message"
 import P2pConnection from "./p2p_connection"
 
 export default class P2pPeer {
-    constructor(sessionId, peerId, container, signaling, config) {
+    constructor(sessionId, peerId, container, signaling, iceConfig, heartbeatConfig) {
         this.sessionId = sessionId
         this.container = container
         this.signaling = signaling
-        this.config = config
+        this.iceConfig = iceConfig
+        this.heartbeatConfig = heartbeatConfig
         this.peerId = peerId
         this.hostPeerId = null
         this.iamHost = false
@@ -47,7 +48,7 @@ export default class P2pPeer {
                         return
                     }
 
-                    const connection = new P2pConnection(this, msg.peer_id, this.peerId, this.iamHost, this.config)
+                    const connection = new P2pConnection(this, msg.peer_id, this.peerId, this.iamHost, this.iceConfig, this.heartbeatConfig)
                     this.connections.push(connection)
 
                     const rtcPeerConnection = connection.setupRTCPeerConnection()
@@ -73,7 +74,7 @@ export default class P2pPeer {
             case ConnectionState.SdpOffer:
                 if (msg.host_peer_id != this.peerId && this.state != ConnectionState.SdpOffer) { // iam not host
                     this.hostPeerId = msg.host_peer_id
-                    const connection = new P2pConnection(this, this.peerId, msg.host_peer_id, this.iamHost, this.config)
+                    const connection = new P2pConnection(this, this.peerId, msg.host_peer_id, this.iamHost, this.iceConfig, this.heartbeatConfig)
                     this.connections.push(connection)
                     
                     const rtcPeerConnection = connection.setupRTCPeerConnection()
@@ -128,32 +129,29 @@ export default class P2pPeer {
         }
     }
 
-    dispatchP2pMessage(msg, type, senderId) {
+    dispatchP2pMessage(message, type, senderId) {
         this.connections.forEach(connection => {
-            connection.sendP2pMessage(msg, type, senderId)
+            connection.sendP2pMessage(message, type, senderId)
+        })
+    }
+    
+    sendP2pMessage(message) {
+        this.connections.forEach(connection => {
+            connection.sendP2pMessage(message, MessageType.Data, this.peerId)
         })
     }
 
     receivedP2pMessage(message) {
-        const msg = JSON.parse(message)
-        switch (msg.type) {
-            case MessageType.Heartbeat:
-                this.connections.forEach(connection => {
-                    if (connection.clientId == msg.senderclientId || connection.hostId == msg.senderclientId) {
-                        connection.state = ConnectionState.Connected
-                        connection.lastTimeUpdate = Date.now()
-                    }
-                })                
-                break
+        switch (message.type) {
             case MessageType.Data:
             case MessageType.DataConnectionState:
                 if (this.iamHost) {
                     //broadcast to all connections
-                    this.dispatchP2pMessage(msg.data, msg.type, msg.senderId)
+                    this.dispatchP2pMessage(message.data, message.type, message.senderId)
                 }
     
                 // dispatch msg to all sub views
-                this.container.dispatchP2pMessage(msg)
+                this.container.dispatchP2pMessage(message)
                 break
             default:
                 break

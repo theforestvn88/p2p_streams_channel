@@ -1,27 +1,30 @@
 import { ConnectionState, MessageType } from "./message"
 
-const CONFIG = {
+const ICE_CONFIG = {
     iceServers: [
-		{ urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"]
+		{ 
+            urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"]
         },
 	],
 }
 
 export default class P2pConnection {
-    constructor(peer, clientId, hostId, iamHost, config) { // TODO: add heartbeatInterval to config
+    constructor(peer, clientId, hostId, iamHost, iceConfig, heartbeatConfig) { // TODO: add heartbeatInterval to config
         this.peer = peer
         this.clientId = clientId
         this.hostId = hostId
         this.iamHost = iamHost
         this.state = ConnectionState.New
-        this.lastTimeUpdate = Date.now()
-        this.config = config || CONFIG
-        this.heartbeat = null
+        this.lastTimeUpdate = 0
+        this.iceConfig = iceConfig || ICE_CONFIG
+        this.heartbeatConfig = heartbeatConfig
+        console.log(this.iceConfig)
+        console.log(this.heartbeatConfig)
     }
 
     setupRTCPeerConnection() {
         console.log("connection start ...")
-        this.rtcPeerConnection = new RTCPeerConnection(this.config)
+        this.rtcPeerConnection = new RTCPeerConnection(this.iceConfig)
 
         this.rtcPeerConnection.onicecandidate = event => {
             console.log(`onicecandidate`)
@@ -66,7 +69,16 @@ export default class P2pConnection {
 
     receiveP2pMessage(event) {
         console.log(`p2p received msg: ${event.data}`)
-        this.peer.receivedP2pMessage(event.data)        
+        const msg = JSON.parse(event.data)
+        switch (msg.type) {
+            case MessageType.Heartbeat:
+                this.state = ConnectionState.Connected
+                this.lastTimeUpdate = Date.now()
+                break
+            default:
+                this.peer.receivedP2pMessage(msg)
+                break
+        }
     }
 
     sendP2pMessage(message, type = MessageType.Data, senderId = null) {
@@ -86,10 +98,8 @@ export default class P2pConnection {
         console.log(event)
         if (this.sendDataChannel) {
             this.sendDataChannelOpen = this.sendDataChannel.readyState == "open"
-            if (this.sendDataChannelOpen) {
+            if (this.sendDataChannelOpen && this.heartbeatConfig) {
                 this.scheduleHeartbeat()
-            } else {
-                this.stopHeartbeat()
             }
         }
     }
@@ -101,12 +111,18 @@ export default class P2pConnection {
     scheduleHeartbeat() {
         this.heartbeat = setTimeout(() => {
             this.sendHeartbeat()
-        }, 5000)
+        }, this.heartbeatConfig.interval_mls)
     }
 
     sendHeartbeat() {
-        this.sendP2pMessage("ping", MessageType.Heartbeat)
-        this.scheduleHeartbeat()
+        if (this.lastTimeUpdate > 0 && Date.now() - this.lastTimeUpdate > this.heartbeatConfig.idle_timeout_mls) {
+            console.log("HEART-BEAT DETECT DISCONNECTED ............")
+            this.state = ConnectionState.DisConnected
+            this.peer.updateP2pConnectionState(this)
+        } else {
+            this.sendP2pMessage("ping", MessageType.Heartbeat)
+            this.scheduleHeartbeat()
+        }
     }
 
     stopHeartbeat() {

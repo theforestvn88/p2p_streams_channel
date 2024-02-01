@@ -17,7 +17,7 @@ class P2pFrameElement extends HTMLElement {
         disconnected: this.subscriptionDisconnected.bind(this)
       }).catch(err => console.log(err))
 
-      this.peer = new P2pPeer(this.sessionId, this.peerId, this, this.subscription, this.config)
+      this.peer = new P2pPeer(this.sessionId, this.peerId, this, this.subscription, this.iceConfig, this.heartbeatConfig)
     }
 
     // called each time the element is removed from the document.
@@ -123,6 +123,16 @@ class P2pFrameElement extends HTMLElement {
 
     get config() {
       return this.params["config"]
+    }
+
+    get iceConfig() {
+      return {
+        iceServers: this.config["iceServers"]
+      }
+    }
+
+    get heartbeatConfig() {
+      return this.config["heartbeat"]
     }
 
     get channel() {
