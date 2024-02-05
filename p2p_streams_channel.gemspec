@@ -31,7 +31,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "rails"
+  spec.add_dependency 'turbo-rails'
   spec.add_dependency 'importmap-rails'
+  spec.add_dependency 'stimulus-rails'
 
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec-rails'
