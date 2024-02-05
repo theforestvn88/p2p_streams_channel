@@ -1,1 +1,10 @@
 /* Application styles */
+
+
+.not-available {
+    display: none;
+}
+
+.available {
+    display: flex;
+}

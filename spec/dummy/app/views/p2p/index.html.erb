@@ -1,7 +1,13 @@
 <h1>P2p#chat</h1>
 
-<%= p2p_frame_tag(session_id: "chat", peer_id: rand(100), js_controller: "chat") do %>
-    <div>
-        .....................
+<%= p2p_frame_tag(session_id: "chat", peer_id: rand(100)) do %>
+    <div data-controller="chat">
+        <div data-chat-target="room">
+
+        <div data-chat-target="messagebox" class="not-available">
+            <input type="text" data-chat-target="message">
+            <input type="submit" value="send"
+                data-action="chat#send">
+        </div>
     </div>
 <% end %>

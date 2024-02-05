@@ -23,4 +23,9 @@ gem "turbo-rails"
 
 gem "redis", "~> 4.0"
 
+
+# test
+
 gem "rspec", "~> 3.0"
+gem "capybara"
+gem "selenium-webdriver"
