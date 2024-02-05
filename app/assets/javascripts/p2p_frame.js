@@ -122,7 +122,7 @@ class P2pFrameElement extends HTMLElement {
     }
 
     get config() {
-      return this.params["config"]
+      return this.params["config"] || {}
     }
 
     get iceConfig() {
