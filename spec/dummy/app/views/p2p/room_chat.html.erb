@@ -1,0 +1,13 @@
+<h1>P2p#chat@<%= params[:name] %></h1>
+
+<%= p2p_frame_tag(session_id: "chat", peer_id: params[:name]) do %>
+    <div data-controller="chat" class="room">
+        <div data-chat-target="room">
+
+        <div data-chat-target="messagebox" class="not-available">
+            <input type="text" data-chat-target="message">
+            <input type="submit" value="send"
+                data-action="chat#send">
+        </div>
+    </div>
+<% end %>

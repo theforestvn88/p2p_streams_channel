@@ -12,6 +12,7 @@ export default class extends P2pController {
   send() {
     console.log("CHAT SEND MESSAGE")
     this.p2pSendMessage(this.messageTarget.value)
+    this.messageTarget.value = ""
   }
 
   p2pReceivedMessage(message) {
@@ -19,8 +20,11 @@ export default class extends P2pController {
     switch(message["type"]) {
       case "Data":
         const chatLine = document.createElement("div")
-        chatLine.innerText = message["data"]
+        chatLine.innerText = `${message["senderId"]}: ${message["data"]}`
         this.roomTarget.append(chatLine)
+        break
+      case "Data.Connection.State":
+        console.log(`CHAT STATUS: ${message["data"]}`)
         break
       default:
         break

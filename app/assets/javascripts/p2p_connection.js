@@ -85,7 +85,7 @@ export default class P2pConnection {
         if (this.sendDataChannel && this.sendDataChannelOpen) {
             const msgJson = JSON.stringify({
                 type: type,
-                senderclientId: senderId || this.peer.peerId,
+                senderId: senderId || this.peer.peerId,
                 data: message
             })
             this.sendDataChannel.send(msgJson)
