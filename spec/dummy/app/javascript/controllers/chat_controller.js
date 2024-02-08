@@ -1,7 +1,7 @@
 import { P2pController } from "p2p"
 
 export default class extends P2pController {
-  static targets = ["message", "messagebox", "room"]
+  static targets = ["message", "messagebox", "messages", "status"]
 
   p2pConnected() {
     console.log("CHAT CONNECTED .......................")
@@ -21,13 +21,26 @@ export default class extends P2pController {
       case "Data":
         const chatLine = document.createElement("div")
         chatLine.innerText = `${message["senderId"]}: ${message["data"]}`
-        this.roomTarget.append(chatLine)
+        this.messagesTarget.append(chatLine)
         break
       case "Data.Connection.State":
-        console.log(`CHAT STATUS: ${message["data"]}`)
+        console.log(`CHAT STATUS: `)
+        console.log(message["data"])
+        this.statusTarget.innerText = ""
+        for (let conn in message["data"]) {
+          const statusView = document.createElement("div")
+          statusView.innerText = `${conn}: ${message["data"][conn]}`
+          this.statusTarget.append(statusView)
+        }; 
         break
       default:
         break
+    }
+  }
+
+  p2pDisconnected() {
+    if (!this.iamHost) {
+      this.statusTarget.innerText = "Stream disconnected! please refresh to continue"
     }
   }
 }

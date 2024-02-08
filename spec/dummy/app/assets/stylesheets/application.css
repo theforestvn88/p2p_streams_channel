@@ -8,3 +8,8 @@
 .available {
     display: flex;
 }
+
+.room {
+    display: flex;
+    justify-content: space-between;
+}

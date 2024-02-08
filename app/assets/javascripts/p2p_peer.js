@@ -41,6 +41,7 @@ export default class P2pPeer {
                     this.iamHost = true
                     this.hostPeerId = this.peerId
                     if (msg.peer_id == this.peerId) {
+                        this.updateP2pConnectionState()
                         return
                     }
 
@@ -161,24 +162,26 @@ export default class P2pPeer {
         }
     }
 
-    updateP2pConnectionState(connection) {
+    updateP2pConnectionState(connection = null) {
         if (this.iamHost) {
-            const states = []
+            this.connectionStatus ||= {}
             this.connections.forEach((connection, peerId) => {
-                states.push({ peerId: peerId, state: connection.state})
+                this.connectionStatus[peerId] = connection.state
             })
-            states.push({peerId: this.hostPeerId, state: ConnectionState.Connected})
-            
+            this.connectionStatus[this.hostPeerId] = ConnectionState.Connected
+
             this.container.dispatchP2pMessage({
                 type: MessageType.DataConnectionState,
                 senderId: this.peerId,
-                data: states
+                data: this.connectionStatus
             })
 
-            this.dispatchP2pMessage(states, MessageType.DataConnectionState, this.hostPeerId)
+            this.dispatchP2pMessage(this.connectionStatus, MessageType.DataConnectionState, this.hostPeerId)
         }
 
-        this.dispatchP2pConnectionState(connection)
+        if (connection) {
+            this.dispatchP2pConnectionState(connection)
+        }
     }
 
     dispatchP2pConnectionState(connection) {

@@ -42,7 +42,6 @@ export default class P2pConnection {
 
         this.rtcPeerConnection.onconnectionstatechange = (ev) => {
             console.log("onconnectionstatechange")
-            console.log(ev)
             console.log(this.rtcPeerConnection.connectionState)
             this.state = this.rtcPeerConnection.connectionState
             if (this.state == ConnectionState.DisConnected || this.state == ConnectionState.Closed) {
@@ -62,6 +61,8 @@ export default class P2pConnection {
             this.receiveDataChannel.onmessage = this.receiveP2pMessage.bind(this)
             this.receiveDataChannel.onopen = this.handleReceiveChannelStatusChange.bind(this)
             this.receiveDataChannel.onclose = this.handleReceiveChannelStatusChange.bind(this)
+            
+            this.peer.updateP2pConnectionState(this)
         }
 
         return this.rtcPeerConnection
