@@ -12,8 +12,6 @@ Gem::Specification.new do |spec|
   spec.homepage = "https://github.com/theforestvn88/p2p_streams_channel"
   spec.required_ruby_version = ">= 2.6.0"
 
-  spec.metadata["allowed_push_host"] = "https://github.com/theforestvn88/p2p_streams_channel"
-
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/theforestvn88/p2p_streams_channel"
   spec.metadata["changelog_uri"] = "https://github.com/theforestvn88/p2p_streams_channel"

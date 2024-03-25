@@ -6,7 +6,7 @@ module P2pStreamsChannel
         
         initializer "p2p_streams_channel.assets" do
             if Rails.application.config.respond_to?(:assets)
-              Rails.application.config.assets.precompile += %w( p2p.js )
+              Rails.application.config.assets.precompile += %w( p2p.min.js )
             end
         end
 
@@ -15,11 +15,6 @@ module P2pStreamsChannel
             ActiveSupport.on_load(:action_controller_base) do
               helper P2pStreamsChannel::Engine.helpers
             end
-        end
-
-        initializer "p2p_streams_channel.importmap", before: "importmap" do |app|
-          app.config.importmap.paths << Engine.root.join("config/importmap.rb")
-          # app.config.importmap.cache_sweepers << Engine.root.join("app/assets/javascripts")
         end
     end
 end
