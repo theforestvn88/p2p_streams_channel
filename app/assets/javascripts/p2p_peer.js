@@ -16,8 +16,8 @@ export default class P2pPeer {
 
     setup() {
         this.connections = new Map()
-        this.dispatchP2pConnectionState(ConnectionState.Negotiating, null)
         this.signal(ConnectionState.SessionJoin, {})
+        this.dispatchP2pConnectionState({state: ConnectionState.Negotiating})
     }
 
     signal(state, data) {
@@ -32,7 +32,6 @@ export default class P2pPeer {
     }
 
     negotiate(msg) {
-        console.log(msg)
         switch (msg.state) {
             case ConnectionState.SessionJoin:
                 break
@@ -77,8 +76,8 @@ export default class P2pPeer {
                     const rtcPeerConnection = connection.setupRTCPeerConnection()
 
                     let offer = JSON.parse(msg[ConnectionState.SdpOffer])
-                    console.log(`${this.peerId} get Offer`)
-                    console.log(offer)
+                    // console.log(`${this.peerId} get Offer`)
+                    // console.log(offer)
                     rtcPeerConnection.setRemoteDescription(new RTCSessionDescription(offer))
                         .then(() => {
                             rtcPeerConnection.createAnswer()
@@ -96,15 +95,13 @@ export default class P2pPeer {
                 break
             case ConnectionState.SdpAnswer:
                 if (msg.host_peer_id == this.peerId) { // iam host
-                    console.log(` ${this.peerId} get Answer`)
+                    // console.log(` ${this.peerId} get Answer`)
                     const clientConnection = this.connections.get(msg.peer_id)
-                    console.log(clientConnection)
                     if (!clientConnection) return;
 
                     const rtcPeerConnection = clientConnection.rtcPeerConnection
                     let answer = JSON.parse(msg[ConnectionState.SdpAnswer])
                     
-                    console.log(answer)
                     rtcPeerConnection.setRemoteDescription(new RTCSessionDescription(answer))
                         .catch(err => console.log(err))
                 }
@@ -118,7 +115,7 @@ export default class P2pPeer {
                 }
                 break
             case ConnectionState.Error:
-                console.log(msg)
+                // console.log("Connection Error")
                 break
             default:
                 break

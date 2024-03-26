@@ -27,30 +27,18 @@ export default class extends Controller {
     }
 
     // p2p callbacks
+    
+    p2pNegotiating() {}
 
-    p2pNegotiating() {
-        console.log("p2pNegotiating ... ")
-    }
+    p2pConnecting() {}
 
-    p2pConnecting() {
-        console.log(`p2pConnecting ... ${[this.peerId, this.hostPeerId, this.iamHost]}`)
-    }
+    p2pConnected() {}
 
-    p2pConnected() {
-        console.log(`p2pConnected ... ${[this.peerId, this.hostPeerId, this.iamHost]}`)
-    }
+    p2pDisconnected() {}
 
-    p2pDisconnected() {
-        console.log(`p2pDisconnected ... ${[this.peerId, this.hostPeerId, this.iamHost]}`)
-    }
+    p2pClosed() {}
 
-    p2pClosed() {
-        console.log(`p2pClosed ... ${[this.peerId, this.hostPeerId, this.iamHost]}`)
-    }
-
-    p2pError() {
-        console.log(`p2pError ... ${[this.peerId, this.hostPeerId, this.iamHost]}`)
-    }
+    p2pError() {}
 
     // send/received p2p message
 
@@ -60,6 +48,5 @@ export default class extends Controller {
         }
     }
 
-    p2pReceivedMessage(message) {
-    }
+    p2pReceivedMessage(message) {}
 }

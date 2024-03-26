@@ -18,17 +18,14 @@ export default class P2pConnection {
         this.lastTimeUpdate = 0
         this.iceConfig = iceConfig || ICE_CONFIG
         this.heartbeatConfig = heartbeatConfig
-        console.log(this.iceConfig)
-        console.log(this.heartbeatConfig)
     }
 
     setupRTCPeerConnection() {
-        console.log("connection start ...")
+        // console.log("connection start ...")
         this.rtcPeerConnection = new RTCPeerConnection(this.iceConfig)
 
         this.rtcPeerConnection.onicecandidate = event => {
-            console.log(`onicecandidate`)
-            console.log(event)
+            // console.log(event)
             if (event.candidate) {
                 let ice = {}
                 ice[ConnectionState.IceCandidate] = event.candidate
@@ -36,13 +33,11 @@ export default class P2pConnection {
             }
         }
         this.rtcPeerConnection.oniceconnectionstatechange = event => {
-            console.log(`oniceconnectionstatechange`)
-            console.log(event)
+            // console.log(event)
         }
 
         this.rtcPeerConnection.onconnectionstatechange = (ev) => {
-            console.log("onconnectionstatechange")
-            console.log(this.rtcPeerConnection.connectionState)
+            // console.log(`onconnectionstatechange ${this.rtcPeerConnection.connectionState}`)
             this.state = this.rtcPeerConnection.connectionState
             if (this.state == ConnectionState.DisConnected || this.state == ConnectionState.Closed) {
                 this.close()
@@ -56,7 +51,7 @@ export default class P2pConnection {
         this.sendDataChannel.onclose = this.handleSendChannelStatusChange.bind(this)
 
         this.rtcPeerConnection.ondatachannel = event => {
-            console.log("ondatachannel p2p ...")
+            // console.log("ondatachannel p2p ...")
             this.receiveDataChannel = event.channel
             this.receiveDataChannel.onmessage = this.receiveP2pMessage.bind(this)
             this.receiveDataChannel.onopen = this.handleReceiveChannelStatusChange.bind(this)
@@ -69,7 +64,7 @@ export default class P2pConnection {
     }
 
     receiveP2pMessage(event) {
-        console.log(`p2p received msg: ${event.data}`)
+        // console.log(`p2p received msg: ${event.data}`)
         const msg = JSON.parse(event.data)
         switch (msg.type) {
             case MessageType.Heartbeat:
@@ -91,12 +86,12 @@ export default class P2pConnection {
             })
             this.sendDataChannel.send(msgJson)
         } else {
-            console.warn("the send data channel is not available!")
+            // console.warn("the send data channel is not available!")
         }
     }
 
     handleSendChannelStatusChange(event) {
-        console.log(event)
+        // console.log(event)
         if (this.sendDataChannel) {
             this.sendDataChannelOpen = this.sendDataChannel.readyState == "open"
             if (this.sendDataChannelOpen && this.heartbeatConfig) {
@@ -106,7 +101,7 @@ export default class P2pConnection {
     }
 
     handleReceiveChannelStatusChange(event) {
-        console.log(event)
+        // console.log(event)
     }
 
     scheduleHeartbeat() {
@@ -117,7 +112,7 @@ export default class P2pConnection {
 
     sendHeartbeat() {
         if (this.lastTimeUpdate > 0 && Date.now() - this.lastTimeUpdate > this.heartbeatConfig.idle_timeout_mls) {
-            console.log("HEART-BEAT DETECT DISCONNECTED ............")
+            // console.log("HEART-BEAT DETECT DISCONNECTED ............")
             this.state = ConnectionState.DisConnected
             this.peer.updateP2pConnectionState(this)
         } else {
@@ -127,12 +122,12 @@ export default class P2pConnection {
     }
 
     stopHeartbeat() {
-        console.log(`stop heartbeat ${this.hostId} <-> ${this.clientId}`)
+        // console.log(`stop heartbeat ${this.hostId} <-> ${this.clientId}`)
         clearTimeout(this.heartbeat)
     }
     
     close() {
-        console.log(`close the connection ${this.hostId} <-> ${this.clientId}`)
+        // console.log(`close the connection ${this.hostId} <-> ${this.clientId}`)
         this.stopHeartbeat()
     }
 }

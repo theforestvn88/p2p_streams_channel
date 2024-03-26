@@ -22,23 +22,22 @@ class P2pFrameElement extends HTMLElement {
 
     // called each time the element is removed from the document.
     disconnectedCallback() {
-      console.log("p2p-frame disconnected")
-      
+      // console.log("p2p-frame disconnected")
       this.unsubscribeSignalChannel()
     }
 
     subscriptionConnected() {
-      console.log("subscriptionConnected")
+      // console.log("subscriptionConnected")
       this.peer.setup()
     }
   
     subscriptionDisconnected() {
-      console.log("subscriptionDisconnected")
+      // console.log("subscriptionDisconnected")
     }
 
     receiveSignal(message) {
-      console.log("receive signal")
-      console.log(message)
+      // console.log("receive signal")
+      // console.log(message)
       if (message.type == MessageType.Connection) {
         this.peer.negotiate(message)
       }
@@ -47,7 +46,6 @@ class P2pFrameElement extends HTMLElement {
     setP2pListener(listener) {
       this.listeners ||= []
       this.listeners.push(listener)
-      console.log(this.listeners)
     }
 
     dispatchP2pMessage(message) {
@@ -79,7 +77,7 @@ class P2pFrameElement extends HTMLElement {
       
       // only host-peer retain connect to the signal server ?
       if (!this.peer?.iamHost) {
-        console.log("im not host so unsubscribe")
+        // console.log("im not host so unsubscribe")
         this.unsubscribeSignalChannel()
       }
     }
