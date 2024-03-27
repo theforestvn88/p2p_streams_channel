@@ -8,13 +8,13 @@ module P2pStreamsChannel
     def importmap
       return unless (importmap_path = Rails.root.join("config/importmap.rb")).exist?
       
-      append_to_file importmap_path, %(pin "p2p", to: "p2p.min.js", preload: true\n)
+      append_to_file importmap_path, %(\npin_all_from "#{File.expand_path("../../../../app/assets/javascripts/p2p/", __dir__)}", under: "p2p"\n)
     end
 
     def node
       return unless Rails.root.join("package.json").exist?
 
-      run "yarn add p2p@file:#{File.expand_path("../../../../app/assets/javascripts/", __dir__)}"
+      run "yarn add p2p@file:#{File.expand_path("../../../../app/assets/javascripts/p2p/", __dir__)}"
     end
 
     def create_initializer

@@ -1,4 +1,4 @@
-import { ConnectionState, MessageType } from "./message"
+import { ConnectionState, MessageType } from "p2p/message"
 
 const ICE_CONFIG = {
     iceServers: [

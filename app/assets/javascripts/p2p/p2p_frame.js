@@ -1,6 +1,6 @@
 import { Turbo, cable } from "@hotwired/turbo-rails"
-import P2pPeer from "./p2p_peer"
-import { MessageType } from "./message"
+import P2pPeer from "p2p/p2p_peer"
+import { MessageType } from "p2p/message"
 
 class P2pFrameElement extends HTMLElement {
     constructor() {

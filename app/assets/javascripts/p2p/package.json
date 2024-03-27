@@ -1,8 +1,8 @@
 {
   "name": "p2p",
   "version": "0.0.1",
-  "files": ["./p2p.min.js"],
-  "main": "./p2p.min.js",
+  "files": ["./*.*"],
+  "main": "./index.js",
   "dependencies": {
     "@hotwired/stimulus": "^3.2.2",
     "@hotwired/turbo-rails": "^8.0.4",

@@ -1,5 +1,5 @@
-import { ConnectionState, MessageType } from "./message"
-import P2pConnection from "./p2p_connection"
+import { ConnectionState, MessageType } from "p2p/message"
+import P2pConnection from "p2p/p2p_connection"
 
 export default class P2pPeer {
     constructor(sessionId, peerId, container, signaling, iceConfig, heartbeatConfig) {

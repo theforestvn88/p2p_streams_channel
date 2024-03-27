@@ -6,7 +6,7 @@ module P2pStreamsChannel
         
         initializer "p2p_streams_channel.assets" do
             if Rails.application.config.respond_to?(:assets)
-              Rails.application.config.assets.precompile += %w( p2p.min.js )
+              Rails.application.config.assets.precompile += Dir["#{root}/app/assets/javascripts/*/*"]
             end
         end
 
