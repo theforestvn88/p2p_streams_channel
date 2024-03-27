@@ -75,8 +75,8 @@ class P2pFrameElement extends HTMLElement {
         listener.p2pConnected()
       })
       
-      // only host-peer retain connect to the signal server ?
-      if (!this.peer?.iamHost) {
+      // only host-peer retain connect to the signal server
+      if (!this.peer?.iamHost && !this.keepCableConnection) {
         // console.log("im not host so unsubscribe")
         this.unsubscribeSignalChannel()
       }
@@ -125,12 +125,16 @@ class P2pFrameElement extends HTMLElement {
 
     get iceConfig() {
       return {
-        iceServers: this.config["iceServers"]
+        iceServers: this.config["ice_servers"]
       }
     }
 
     get heartbeatConfig() {
       return this.config["heartbeat"]
+    }
+
+    get keepCableConnection() {
+      return this.config["keep_cable_connection"]
     }
 
     get channel() {
