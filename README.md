@@ -98,7 +98,20 @@ $ rails g p2p_streams_channel:controller chat
 Render a p2p-frame-tag
 ```ruby
 # views/chat_rooms/_chat_room.html.erb
-<%= p2p_frame_tag(session_id: dom_id(chat_room), peer_id: dom_id(current_user)) do %>
+<%= p2p_frame_tag(
+    session_id: dom_id(chat_room), 
+    peer_id: dom_id(current_user),
+    # config: {
+        # ice_servers: [
+		#     { urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"] },
+	    # ],
+        # heartbeat: {
+        #     interval_mls: 100,
+        #     idle_timeout_mls: 200 
+        # },
+        # keepCableConnection: false
+    # }
+) do %>
     <div data-controller="chat">
         # chat room views
     </div>
