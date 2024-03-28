@@ -27,9 +27,9 @@ export default class extends P2pController {
         console.log(`CHAT STATUS: `)
         console.log(message["data"])
         this.statusTarget.innerText = ""
-        for (let conn in message["data"]) {
+        for (let [peer, state] of Object.entries(message["data"])) {
           const statusView = document.createElement("div")
-          statusView.innerText = `${conn}: ${message["data"][conn]}`
+          statusView.innerText = `${peer}: ${state}`
           this.statusTarget.append(statusView)
         }; 
         break
