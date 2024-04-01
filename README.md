@@ -195,9 +195,6 @@ export default class extends P2pController {
 
 run test:
 ```ruby
-$ cd spec/dummy
-$ rails g p2p_streams_channel:install
-$ cd ../..
 $ rake spec
 ```
 

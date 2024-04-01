@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.authors = ["theforestvn88"]
   spec.email = ["theforestvn88@gmail.com"]
 
-  spec.summary = "rails p2p turbo streams channel"
+  spec.summary = "Allow to setup one-to-many P2P stream connections (WebRTC) between clients through Rails server (ActionCable) as the signaling server"
   spec.description = "Allow to setup one-to-many P2P stream connections (WebRTC) between clients through Rails server (ActionCable) as the signaling server"
   spec.homepage = "https://github.com/theforestvn88/p2p_streams_channel"
   spec.required_ruby_version = ">= 2.6.0"
