@@ -18,3 +18,5 @@
 yarn.lock
 
 Gemfile.lock
+
+*.gem

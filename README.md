@@ -48,7 +48,8 @@ iceServers --ice-candidate----> client-user --> host-user
 Connected
 =========
 
-After client-user connected to the host-user, all of them will disconnected to the signaling server (in order to save memory and other things), only the host-user keep connect to Rails server.
+After a client-user connected to the host-user, it'll be disconnected to the signaling server (in order to save memory).
+Only the host-user keep connect to Rails server.
 In case you want keep client connection, you could set params `keepCableConnection: true` to the p2p-frame.
 
 client-user1 ----X disconnect from -----> Rails server Action cable
@@ -89,12 +90,6 @@ $ rails g p2p_streams_channel:install
 
 ## Usage
 
-Create a Stimulus P2pController in which you will receive other p2p-connections status, data send by other connected connections, and send your data to others.
-```ruby
-$ rails g p2p_streams_channel:controller chat
-# it will create js file `app/javascript/controllers/chat_controller.js`
-```
-
 Render a p2p-frame-tag
 ```ruby
 # views/chat_rooms/_chat_room.html.erb
@@ -118,10 +113,11 @@ Render a p2p-frame-tag
 <% end %>
 ```
 
-
-Now you could implement your client side, 
-for example: here is a simple chat controller:
-
+Create a Stimulus P2pController in which you will receive other p2p-connections status, data and send back your data to others.
+```ruby
+$ rails g p2p_streams_channel:controller chat
+# it will create js file `app/javascript/controllers/chat_controller.js`
+```
 
 ```js
 // app/javascript/controllers/chat_controller.js

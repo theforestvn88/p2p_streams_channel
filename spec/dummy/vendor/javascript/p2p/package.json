@@ -1,0 +1,14 @@
+{
+  "name": "p2p",
+  "version": "0.0.1",
+  "files": ["./*.*"],
+  "main": "./index.js",
+  "dependencies": {
+    "@hotwired/stimulus": "^3.2.2",
+    "@hotwired/turbo-rails": "^8.0.4",
+    "esbuild": "^0.20.2"
+  },
+  "scripts": {
+    "build": "esbuild app/assets/javascripts/*.* --bundle --minify --format=esm --outdir=app/assets/builds --public-path=/assets"
+  }
+}
