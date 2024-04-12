@@ -96,6 +96,7 @@ Render a p2p-frame-tag
 <%= p2p_frame_tag(
     session_id: dom_id(chat_room), 
     peer_id: dom_id(current_user),
+    expires_in: 1.hour,	
     # config: {
         # ice_servers: [
 		#     { urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"] },
@@ -189,6 +190,18 @@ export default class extends P2pController {
     // this.hostPeerId: the host peer id
     //
 }
+```
+
+### Store
+
+`Rails.cache` is the default store.
+You could implement store by yourself, ex: database-base store, make sure your store can `fetch`, `write`, and `read`.
+Then set up in initializer:
+```ruby
+# config/initializers/p2p_streams_channel.rb
+P2pStreamsChannel.config do |config|
+    config.store = YourStore.new
+end
 ```
 
 ## Development
