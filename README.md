@@ -192,10 +192,13 @@ export default class extends P2pController {
 }
 ```
 
-### Store
+### Session Store
+
+Session Store will cache p2p session (with `session_id` key you provide in p2p_frame_tag), 
+this session contains peers infomation, especially the current host peer which will automatically negotiate with the new peers or re-connect peers.
 
 `Rails.cache` is the default store.
-You could implement store by yourself, ex: database-base store, make sure your store can `fetch`, `write`, and `read`.
+You could implement store by yourself, make sure your store can `fetch`, `write`, and `read`.
 Then set up in initializer:
 ```ruby
 # config/initializers/p2p_streams_channel.rb
